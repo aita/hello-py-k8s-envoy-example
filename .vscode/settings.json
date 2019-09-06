@@ -1,0 +1,6 @@
+{
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "python.pythonPath": "/Users/ryo.aita/Library/Caches/pypoetry/virtualenvs/hello-py-py3.7/bin/python"
+}
