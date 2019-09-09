@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello-service
+  name: hello-gateway-service
 spec:
   type: NodePort
   selector:
-    app: hello
+    app: hello-gateway
   ports:
     - name: proxy
       port: 3000
@@ -20,16 +20,16 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello
+  name: hello-gateway
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: hello
+      app: hello-gateway
   template:
     metadata:
       labels:
-        app: hello
+        app: hello-gateway
     spec:
       volumes:
         - name: envoy
@@ -37,16 +37,10 @@ spec:
             name: envoy-config
       containers:
         - name: hello-gateway
-          image: hello-py:v2
+          image: hello-py:v3
           command: ["gateway"]
           ports:
             - containerPort: 8000
-        - name: hello-greeter
-          image: hello-py:v2
-          imagePullPolicy: Never
-          command: ["greeter"]
-          ports:
-            - containerPort: 50051
         - name: envoy
           image: envoyproxy/envoy:latest
           imagePullPolicy: IfNotPresent
@@ -62,3 +56,5 @@ spec:
               name: envoy-sidecar
             - containerPort: 10001
               name: envoy-admin
+            - containerPort: 50051
+              name: envoy-grpc

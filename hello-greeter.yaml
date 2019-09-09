@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-greeter-service
+spec:
+  clusterIP: None
+  selector:
+    app: hello-greeter
+  ports:
+    - name: greeter
+      port: 10000
+      protocol: TCP
+      targetPort: 10000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-greeter
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-greeter
+  template:
+    metadata:
+      labels:
+        app: hello-greeter
+    spec:
+      volumes:
+        - name: envoy
+          configMap:
+            name: envoy-config
+      containers:
+        - name: hello-greeter
+          image: hello-py:v3
+          imagePullPolicy: Never
+          command: ["greeter"]
+          ports:
+            - containerPort: 50051
+        - name: envoy
+          image: envoyproxy/envoy:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: envoy
+              mountPath: /etc/envoy/
+          command:
+            - "/usr/local/bin/envoy"
+          args:
+            - "--config-path /etc/envoy/envoy-hello-greeter.yaml"
+          ports:
+            - containerPort: 10000
+              name: envoy-sidecar
+            - containerPort: 10001
+              name: envoy-admin

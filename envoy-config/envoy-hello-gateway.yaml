@@ -82,7 +82,7 @@ static_resources:
     - name: greeter
       http2_protocol_options: {}
       connect_timeout: 0.25s
-      type: static
+      type: strict_dns
       lb_policy: round_robin
       health_checks:
         - timeout: 5s
@@ -92,5 +92,5 @@ static_resources:
           tcp_health_check: {}
       hosts:
         - socket_address:
-            address: 127.0.0.1
-            port_value: 60051
+            address: hello-greeter-service
+            port_value: 10000
